@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +28,18 @@ public class SampleVoicevoxCoreSharpScript : MonoBehaviour
         }
 
         // TODO: This is platform dependent code, FIXME
-        var loadOnnxruntimeOptions = new LoadOnnxruntimeOptions(Path.Combine(Application.dataPath, "Plugins", "runtimes", "osx.10.14-arm64", "native", "libvoicevox_onnxruntime.1.17.3.dylib"));
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        var platform = "windows-x86_64";
+        var libname = "voicevox_onnxruntime.1.17.3.dll";
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+        var platform = "osx.10.14-arm64";
+        var libname = "libvoicevox_onnxruntime.1.17.3.dylib";
+#elif UNITY_ANDROID
+        var platform = "android-arm64";
+        var libname = "libvoicevox_onnxruntime.1.17.3.so";
+#endif
+
+        var loadOnnxruntimeOptions = new LoadOnnxruntimeOptions(Path.Combine(Application.dataPath, "Plugins", "runtimes", platform, "native", libname));
         if (Onnxruntime.LoadOnce(loadOnnxruntimeOptions, out var onnxruntime) != ResultCode.RESULT_OK)
         {
             Debug.LogError("Failed to initialize onnxruntime");
